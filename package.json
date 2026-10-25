@@ -1,0 +1,43 @@
+{
+  "name": "verdict",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Verdict runs a personal, statistically honest trial of a skincare product using YouCam AI Skin Analysis, then tells you whether to keep buying it.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "smoke:youcam": "node scripts/youcam-smoke.mjs",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "dependencies": {
+    "idb": "^8.0.4",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "^16.4.3",
+    "fake-indexeddb": "^6.2.0",
+    "jsdom": "^27.0.0",
+    "playwright": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
+  }
+}
