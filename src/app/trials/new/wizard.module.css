@@ -1,0 +1,163 @@
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+
+.rail {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  gap: 18px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1.5px solid var(--rule-strong);
+}
+
+.steps li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 15px;
+  color: var(--ink-3);
+}
+
+.steps li[data-state="current"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.steps li[data-state="current"] span {
+  color: var(--accent);
+}
+
+.steps li[data-state="done"] {
+  color: var(--ink-2);
+}
+
+.summary {
+  display: grid;
+  gap: 2px;
+}
+
+.main {
+  max-width: 720px;
+  min-width: 0;
+}
+
+.h1 {
+  font-size: clamp(32px, 4.4vw, 48px);
+  outline: none;
+}
+
+.h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.check {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.check > span {
+  display: grid;
+  gap: 2px;
+}
+
+.checkLabel {
+  font-weight: 500;
+}
+
+.rowOn td {
+  background: var(--sunk);
+}
+
+.priceRow {
+  display: grid;
+  grid-template-columns: 1fr 120px 1fr;
+  gap: 12px;
+}
+
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.fieldset legend {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.plan {
+  margin: 10px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.plan > div {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.plan dt {
+  color: var(--ink-3);
+}
+
+.plan dd {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .rail {
+    position: static;
+  }
+  .steps {
+    display: flex;
+    gap: 14px;
+    border-top: 0;
+    overflow-x: auto;
+  }
+  .steps li {
+    border-bottom: 2px solid var(--rule);
+    white-space: nowrap;
+  }
+  .steps li[data-state="current"] {
+    border-bottom-color: var(--accent);
+  }
+  .summary {
+    display: none;
+  }
+  .priceRow,
+  .plan > div {
+    grid-template-columns: 1fr;
+  }
+}
