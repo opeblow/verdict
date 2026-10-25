@@ -1,0 +1,58 @@
+.card {
+  padding: 20px 22px 16px;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 14px;
+}
+
+.product {
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.body {
+  padding: 18px 0 8px;
+  display: grid;
+  gap: 10px;
+}
+
+.headline {
+  font-size: clamp(28px, 4vw, 36px);
+}
+
+.list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.item {
+  padding: 12px 0 6px;
+  border-top: 1px solid var(--rule);
+}
+
+.itemHead {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.delta {
+  font-size: 15px;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
