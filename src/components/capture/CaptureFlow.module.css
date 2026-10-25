@@ -1,0 +1,166 @@
+.root {
+  display: grid;
+  gap: 16px;
+  max-width: 520px;
+}
+
+.title {
+  font-size: 20px;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  background: #1b1a17;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.video,
+.ghost,
+.still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Preview is mirrored so moving left moves left. The saved photo is not. */
+.video,
+.ghost {
+  transform: scaleX(-1);
+}
+
+.ghost {
+  opacity: 0.32;
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+.guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: var(--sunk);
+  color: var(--ink);
+}
+
+.tips {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 400 96px/1 var(--font-display);
+  color: #fffdf9;
+}
+
+.working {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  background: rgba(20, 19, 17, 0.62);
+  color: #fffdf9;
+  text-align: center;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(255, 253, 249, 0.3);
+  border-top-color: #fffdf9;
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.readout {
+  display: grid;
+  gap: 10px;
+}
+
+.status {
+  padding: 10px 12px;
+  border-left: 3px solid var(--keep);
+  background: var(--sunk);
+  font-size: 15px;
+}
+
+.status[data-level="warn"] {
+  border-left-color: var(--wait);
+}
+
+.status[data-level="block"] {
+  border-left-color: var(--stop);
+}
+
+.meters {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.meters dt {
+  font: 500 11px/1.3 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.meters dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+}
+
+.issues {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.issues li {
+  padding: 8px 12px;
+  border-left: 3px solid var(--wait);
+  background: var(--sunk);
+  font-size: 14px;
+}
+
+.issues li[data-level="block"] {
+  border-left-color: var(--stop);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
