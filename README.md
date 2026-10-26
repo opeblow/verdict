@@ -11,8 +11,8 @@ It ends with a decision you can act on at the till: keep buying it, stop, or wai
 
 [![CI](https://github.com/opeblow/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/opeblow/verdict/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/opeblow/verdict/actions/workflows/codeql.yml/badge.svg)](https://github.com/opeblow/verdict/actions/workflows/codeql.yml)
-[![Unit tests](https://img.shields.io/badge/unit%20tests-108-24613d.svg)](docs/TESTING.md#unit-tests-vitest)
-[![Browser tests](https://img.shields.io/badge/browser%20tests-25-24613d.svg)](docs/TESTING.md#browser-tests-playwright)
+[![Unit tests](https://img.shields.io/badge/unit%20tests-175-24613d.svg)](docs/TESTING.md#unit-tests-vitest)
+[![Browser tests](https://img.shields.io/badge/browser%20tests-42-24613d.svg)](docs/TESTING.md#browser-tests-playwright)
 [![WCAG 2.2 AA](https://img.shields.io/badge/axe-WCAG%202.2%20AA-24613d.svg)](tests/e2e/a11y.spec.ts)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-1c1b18.svg?logo=typescript&logoColor=white)](tsconfig.json)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1c1b18.svg)](LICENSE)
@@ -54,7 +54,7 @@ It ends with a decision you can act on at the till: keep buying it, stop, or wai
 | **How YouCam is used** | As a measuring instrument across weeks: the full upload, analyse, poll, mask and delete cycle, HD and SD, up to 8 concerns per call |
 | **What makes it trustworthy** | `raw_score` only, a measured personal noise floor, 95% ranges, matched light, and "too early" as a real answer |
 | **Privacy** | No accounts and no server database. Photos and scores live on your device. Photos are deleted from YouCam once results are saved. |
-| **Engineering** | Next.js 16, React 19, strict TypeScript, 108 unit tests, 25 browser tests, axe accessibility checks, eight decision records, CI, CodeQL, strict CSP |
+| **Engineering** | Next.js 16, React 19, strict TypeScript, 175 unit tests, 42 browser tests, axe accessibility checks, eleven decision records, CI, CodeQL, strict CSP |
 | **Track** | Skin AI |
 
 ## For judges
@@ -71,8 +71,9 @@ The four criteria are weighted equally. Every claim below links to the code, tes
 | `raw_score` for every calculation, because YouCam documents `ui_score` as adjusted upwards | [ADR 0002](docs/adr/0002-raw-score-not-ui-score.md) |
 | The live engine error format, `"('message', 'error_code')"`, parsed into plain instructions such as "Move closer" | [`errors.ts`](src/lib/youcam/errors.ts) |
 | Photos deleted from YouCam only after results are safely on the device, with a free retry if saving fails | [ADR 0006](docs/adr/0006-delete-from-youcam-after-local-save.md) |
+| An MCP endpoint lets AI assistants plan and judge trials with the same engine, without spending units or seeing photos | [MCP.md](docs/MCP.md), [ADR 0011](docs/adr/0011-mcp-tools-for-assistants.md) |
 | A dependency-free statistics engine: noise with a cautious prior, least-squares trend, pooled 95% interval | [`stats.ts`](src/lib/domain/stats.ts), [ADR 0004](docs/adr/0004-change-must-clear-measured-noise.md) |
-| 108 unit tests and 25 browser tests in CI, with YouCam mocked so no units are spent | [TESTING.md](docs/TESTING.md), [`ci.yml`](.github/workflows/ci.yml) |
+| 175 unit tests and 42 browser tests in CI, with YouCam mocked so no units are spent | [TESTING.md](docs/TESTING.md), [`ci.yml`](.github/workflows/ci.yml) |
 
 ### 2. Design
 
@@ -82,6 +83,7 @@ The four criteria are weighted equally. Every claim below links to the code, tes
 | Guided capture: your first photo is overlaid on the camera, with a live readout of brightness, side light, colour temperature, glare and blur | [`CaptureFlow.tsx`](src/components/capture/CaptureFlow.tsx), [`quality.ts`](src/lib/capture/quality.ts) |
 | Product search, barcode scanning and manual entry, with ingredients read automatically | [`ProductPicker.tsx`](src/components/product/ProductPicker.tsx) |
 | Cost per week and per year next to the verdict, so the answer is about money as well as skin | [`TrialDashboard.tsx`](src/app/trials/[id]/TrialDashboard.tsx) |
+| Spoken guidance reads the light checks, countdown and results aloud, and the verdict can be read aloud, using on-device speech only | [ADR 0010](docs/adr/0010-spoken-guidance-on-device.md), [`spoken-guidance.spec.ts`](tests/e2e/spoken-guidance.spec.ts) |
 | A distinctive editorial design system with light and dark themes, phone first, checked against WCAG 2.2 AA in both themes | [`globals.css`](src/app/globals.css), [`a11y.spec.ts`](tests/e2e/a11y.spec.ts) |
 
 ### 3. Potential impact
@@ -91,6 +93,7 @@ The four criteria are weighted equally. Every claim below links to the code, tes
 | Meets a decision every skincare buyer makes, repeatedly: buy it again or not | [The problem](#the-problem) |
 | Stops people abandoning good products too early, by giving each active a fair-verdict week (niacinamide on pores: about eight weeks) | [`ingredients.ts`](src/lib/domain/ingredients.ts), 18 actives |
 | Catches irritation early: redness is measured on every photo, whatever the product claims, and a rise stops the trial | [`concerns.ts`](src/lib/domain/concerns.ts), [`verdict.test.ts`](tests/unit/verdict.test.ts) |
+| A shareable measured result: review text and a card with the change, its 95% range and photo noise, never the photo, for store reviews | [`share.ts`](src/components/verdict/share.ts), [`share.spec.ts`](tests/e2e/share.spec.ts) |
 | Value for shoppers (money not wasted) and for retailers (fewer returns, confident repeat purchases of products that work) | [Roadmap](#roadmap) |
 | Ready to run: one-click deploy, guarded API units, no database to operate | [SETUP.md](docs/SETUP.md#6-deploy) |
 
@@ -101,6 +104,7 @@ The four criteria are weighted equally. Every claim below links to the code, tes
 | Uses YouCam as a measuring instrument across time. One score is a curiosity; a series with known noise is evidence. | [METHOD.md](docs/METHOD.md) |
 | Two baseline photos a minute apart measure each person's own noise floor, and every claim of change must clear it | [ADR 0004](docs/adr/0004-change-must-clear-measured-noise.md) |
 | Tells a purge from a reaction: blemishes rising early on a retinoid or acid are likely purging; rising redness means stop | [`verdict.ts`](src/lib/domain/verdict.ts) |
+| Fair to every skin tone: the light checks judge the room, not the skin. The first version blocked the two darkest Monk Skin Tones in perfect light; now all ten get the same answer, tested in unit and browser tests | [ADR 0009](docs/adr/0009-light-checks-judge-the-room-not-the-skin.md), [`fairness.test.ts`](tests/unit/fairness.test.ts) |
 | Compares each person only with themselves, in their own light, instead of with population norms that may fit some skin tones poorly | [Limits](#limits) |
 
 ### Test it in five minutes
@@ -120,9 +124,9 @@ A real trial takes weeks, so the landing page shows the real engine's output on 
 ```bash
 git clone https://github.com/opeblow/verdict.git && cd verdict
 npm install
-npm test                                    # 108 unit tests, including every verdict rule
+npm test                                    # 175 unit tests, including every verdict rule
 npm run build && npx playwright install chromium
-npm run test:e2e                            # 25 browser tests, YouCam mocked
+npm run test:e2e                            # 42 browser tests, YouCam mocked
 ```
 
 ## The problem
@@ -222,9 +226,11 @@ Full write-up: [docs/METHOD.md](docs/METHOD.md).
 | Area | What is in place |
 |---|---|
 | **Architecture** | One Next.js app. Personal data in the browser's IndexedDB; a stateless server holds the key. Pure domain layer with no I/O. [ARCHITECTURE.md](docs/ARCHITECTURE.md) |
-| **Decisions** | Eight architecture decision records, each naming the code and tests that enforce it. [docs/adr](docs/adr/README.md) |
-| **Tests** | 108 unit tests (Vitest) and 25 browser tests (Playwright) on desktop and phone, including a full trial, a failed-save retry and API guards. [TESTING.md](docs/TESTING.md) |
-| **Accessibility** | axe finds no WCAG 2.2 A or AA violations on six pages in light and dark themes; the wizard works by keyboard alone; charts have text summaries; status changes are announced |
+| **Decisions** | Eleven architecture decision records, each naming the code and tests that enforce it. [docs/adr](docs/adr/README.md) |
+| **Tests** | 175 unit tests (Vitest) and 42 browser tests (Playwright) on desktop and phone, including a full trial, a failed-save retry, all ten Monk Skin Tones, spoken guidance, sharing, MCP and API guards. [TESTING.md](docs/TESTING.md) |
+| **Accessibility** | axe finds no WCAG 2.2 A or AA violations on every page, the photo step and the dashboard, in light and dark themes; spoken guidance; the wizard works by keyboard alone; charts have text summaries |
+| **Inclusion** | Light checks give every Monk Skin Tone the same answer in the same light ([ADR 0009](docs/adr/0009-light-checks-judge-the-room-not-the-skin.md)) |
+| **AI assistants** | A stateless MCP endpoint exposes the engine as four read-only tools ([MCP.md](docs/MCP.md)) |
 | **Security** | Strict Content Security Policy, SSRF allow-list on the mask proxy, Zod validation, constant-time access code, rate limits, CodeQL. [SECURITY.md](SECURITY.md) |
 | **Privacy** | No accounts, no server database, no request logging; export, import and erase. [PRIVACY.md](docs/PRIVACY.md) |
 | **Honest copy** | A test fails the build on medical claims or emoji in user-facing text. [`copy-guard.test.ts`](tests/unit/copy-guard.test.ts) |
@@ -276,6 +282,7 @@ npm run dev                     # http://localhost:3000
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System, layers, data model, repository layout |
 | [docs/adr/](docs/adr/README.md) | Architecture decision records |
 | [docs/API.md](docs/API.md) | HTTP routes and error codes |
+| [docs/MCP.md](docs/MCP.md) | Connecting an AI assistant to the engine |
 | [docs/TESTING.md](docs/TESTING.md) | Test suites and how to extend them |
 | [docs/SETUP.md](docs/SETUP.md) | Install, configure, deploy, troubleshoot |
 | [docs/PRIVACY.md](docs/PRIVACY.md) | Where data goes |
@@ -291,7 +298,6 @@ Verdict measures how skin looks in photos. It is not a medical device and does n
 
 - **Split-face trials:** product on one side only, compared using the detection masks.
 - **YouCam Skin Tone Analysis** as an independent light-matching check.
-- **An MCP tool interface** so an assistant can run check-ins in conversation.
 - **For retailers:** opt-in, anonymised "how often does this product earn a Keep" on product pages.
 
 ## Credits and licence

@@ -9,7 +9,7 @@ Everything about Verdict beyond the [project README](../README.md).
 | [METHOD.md](METHOD.md) | How scores become a keep, stop or wait decision: noise floor, trends, intervals, ingredient timelines |
 | [YOUCAM.md](YOUCAM.md) | How YouCam AI Skin Analysis is used: call sequence, concerns, unit budget, honest-measurement decisions |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System diagram, layers, data model and repository layout |
-| [adr/](adr/README.md) | Eight architecture decision records: what was decided, why, and what enforces it |
+| [adr/](adr/README.md) | Eleven architecture decision records: what was decided, why, and what enforces it |
 
 ## Run it
 
