@@ -73,7 +73,8 @@ const sleep = (ms: number, signal?: AbortSignal) =>
 
 /**
  * Upload, poll and collect. Masks are copied to the device straight away
- * because YouCam's result links expire, then the task is deleted on YouCam.
+ * because YouCam's result links expire. The caller deletes the task with
+ * `releaseTask` once the results are saved.
  */
 export async function analyse(
   photo: { blob: Blob; width: number; height: number },
@@ -131,10 +132,15 @@ export async function analyse(
   if (analysis.resizedImageUrl) jobs.push(fetchBlob("__resized", analysis.resizedImageUrl));
   await Promise.all(jobs);
 
-  // Best effort: remove the photo from YouCam now that everything is on the device.
-  void fetch(`/api/analyze/${encodeURIComponent(taskId)}`, { method: "DELETE", headers: headers() }).catch(() => {});
-
   return { taskId, analysis, masks };
+}
+
+/**
+ * Best effort: remove the photo and results from YouCam. Call only after the
+ * results are saved on the device, so a failed save can still be retried.
+ */
+export function releaseTask(taskId: string): void {
+  void fetch(`/api/analyze/${encodeURIComponent(taskId)}`, { method: "DELETE", headers: headers() }).catch(() => {});
 }
 
 export interface ServerHealth {

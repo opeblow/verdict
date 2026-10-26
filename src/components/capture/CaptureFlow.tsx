@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FACE_GUIDE, assessConditions, matchScore, measureFrame, type CaptureIssue } from "@/lib/capture/quality";
 import { SHORT_SIDE_MIN, bestModeFor, loadImage, preparePhoto, sampleFrame, type Drawable, type PreparedPhoto } from "@/lib/capture/image";
-import { ApiError, analyse, setAccessCode, type AnalysisPhase, type AnalysisResult } from "@/lib/client/api";
+import { ApiError, analyse, releaseTask, setAccessCode, type AnalysisPhase, type AnalysisResult } from "@/lib/client/api";
 import { unitCost, type AnalysisMode, type Concern } from "@/lib/domain/concerns";
 import type { CaptureConditions } from "@/lib/domain/model";
 import { useObjectUrl } from "@/lib/client/useTrial";
@@ -52,6 +52,9 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
   const sampleRef = useRef<HTMLCanvasElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  // An analysed result that couldn't be saved yet. Kept so a retry saves it
+  // without paying for a second analysis.
+  const unsavedRef = useRef<CaptureOutcome | null>(null);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -62,6 +65,7 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
     () => () => {
       stopCamera();
       abortRef.current?.abort();
+      if (unsavedRef.current) releaseTask(unsavedRef.current.taskId);
     },
     [stopCamera],
   );
@@ -168,18 +172,45 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
     setPhase("working");
     setWork("uploading");
     abortRef.current = new AbortController();
+    let result: AnalysisResult;
     try {
-      const result = await analyse(shot.photo, chosen, concerns, setWork, abortRef.current.signal);
-      await onDone({ ...result, photo: shot.photo, conditions: shot.conditions, mode: chosen });
+      result = await analyse(shot.photo, chosen, concerns, setWork, abortRef.current.signal);
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const e = err instanceof ApiError ? err : new ApiError("Something went wrong. Try again.", "unknown", 0);
       setError({ code: e.code, message: e.message });
       setPhase("error");
+      return;
     }
+    unsavedRef.current = { ...result, photo: shot.photo, conditions: shot.conditions, mode: chosen };
+    await save();
+  }
+
+  async function save() {
+    const outcome = unsavedRef.current;
+    if (!outcome) return;
+    setPhase("working");
+    setWork("saving");
+    try {
+      await onDone(outcome);
+    } catch {
+      setError({
+        code: "save_failed",
+        message:
+          "Your results couldn't be saved on this device. Check that this browser allows site storage and isn't in private mode, then try saving again. This won't use more units.",
+      });
+      setPhase("error");
+      return;
+    }
+    unsavedRef.current = null;
+    releaseTask(outcome.taskId);
   }
 
   function retake() {
+    // Abandoning an unsaved result: remove it from YouCam now rather than
+    // leaving it for the 24-hour expiry.
+    if (unsavedRef.current) releaseTask(unsavedRef.current.taskId);
+    unsavedRef.current = null;
     setShot(null);
     setError(null);
     setIssues([]);
@@ -357,7 +388,7 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
             </button>
           </>
         )}
-        {phase === "working" && (
+        {phase === "working" && work !== "saving" && (
           <button
             className="btn btn-quiet"
             onClick={() => {
@@ -370,10 +401,17 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
         )}
         {phase === "error" && (
           <>
-            {shot && error?.code !== "low_res" && (
-              <button className="btn btn-accent" onClick={submit}>
-                Try again
+            {error?.code === "save_failed" ? (
+              <button className="btn btn-accent" onClick={save}>
+                Try saving again
               </button>
+            ) : (
+              shot &&
+              error?.code !== "low_res" && (
+                <button className="btn btn-accent" onClick={submit}>
+                  Try again
+                </button>
+              )
             )}
             <button className="btn btn-ghost" onClick={retake}>
               Retake photo

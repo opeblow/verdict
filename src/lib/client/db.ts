@@ -26,6 +26,11 @@ export function db(): Promise<IDBPDatabase<VerdictDB>> {
       const checkins = database.createObjectStore("checkins", { keyPath: "id" });
       checkins.createIndex("byTrial", "trialId");
     },
+  }).catch((err: unknown) => {
+    // Forget a failed open so the next call tries again. Otherwise one
+    // transient failure would break every save until the page is reloaded.
+    dbPromise = null;
+    throw err;
   });
   return dbPromise;
 }
