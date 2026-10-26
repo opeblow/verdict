@@ -1,5 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { analysePhoto, choosePhoto, startTrial } from "./support/flows";
+import { syntheticFace } from "./support/photos";
+import { mockYouCam } from "./support/youcam-mock";
 
 const PAGES = [
   { path: "/", name: "landing" },
@@ -23,6 +26,27 @@ for (const scheme of ["light", "dark"] as const) {
         expect(summary).toEqual([]);
       });
     }
+  });
+}
+
+const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
+const describeViolations = (vs: Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"]) =>
+  vs.map((v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`the photo step and a trial dashboard with data pass axe in the ${scheme} theme`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await mockYouCam(page);
+    await startTrial(page, "Axe serum");
+    await choosePhoto(page, await syntheticFace(page, { seed: 1 }));
+    expect(describeViolations((await new AxeBuilder({ page }).withTags(TAGS).analyze()).violations)).toEqual([]);
+
+    await page.getByRole("button", { name: "Analyse this photo" }).click();
+    await expect(page.getByRole("heading", { name: /One more/ })).toBeVisible();
+    await analysePhoto(page, await syntheticFace(page, { seed: 2 }));
+    await page.waitForURL(/\/trials\/[^/]+\?new=1$/);
+    await expect(page.getByRole("heading", { name: "Targets" })).toBeVisible();
+    expect(describeViolations((await new AxeBuilder({ page }).withTags(TAGS).analyze()).violations)).toEqual([]);
   });
 }
 

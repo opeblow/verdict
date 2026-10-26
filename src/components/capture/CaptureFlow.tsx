@@ -6,6 +6,7 @@ import { SHORT_SIDE_MIN, bestModeFor, loadImage, preparePhoto, sampleFrame, type
 import { ApiError, analyse, releaseTask, setAccessCode, type AnalysisPhase, type AnalysisResult } from "@/lib/client/api";
 import { unitCost, type AnalysisMode, type Concern } from "@/lib/domain/concerns";
 import type { CaptureConditions } from "@/lib/domain/model";
+import { speak, useSpeakWhenSettled, useSpokenGuidance } from "@/lib/client/speech";
 import { useObjectUrl } from "@/lib/client/useTrial";
 import styles from "./CaptureFlow.module.css";
 
@@ -55,6 +56,7 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
   // An analysed result that couldn't be saved yet. Kept so a retry saves it
   // without paying for a second analysis.
   const unsavedRef = useRef<CaptureOutcome | null>(null);
+  const [speakOn, setSpeakOn, speechOk] = useSpokenGuidance();
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -204,6 +206,7 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
     }
     unsavedRef.current = null;
     releaseTask(outcome.taskId);
+    if (speakOn) speak("Results saved.");
   }
 
   function retake() {
@@ -219,6 +222,25 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
 
   const blocked = issues.some((i) => i.level === "block");
   const top = issues[0];
+
+  // Spoken guidance: the same messages the screen shows, read out once they
+  // settle, so the photo can be lined up without reading the readout.
+  const spokenNow =
+    phase === "live" && countdown === 0
+      ? (top?.message ?? "Good light. Line up with the oval and hold still.")
+      : phase === "review"
+        ? top
+          ? `${top.message}${blocked ? " Retake the photo." : ""}`
+          : "Photo looks good. Choose Analyse this photo."
+        : phase === "working"
+          ? PHASE_TEXT[work]
+          : phase === "error"
+            ? (error?.message ?? null)
+            : null;
+  useSpeakWhenSettled(spokenNow, speakOn, phase === "live" ? 900 : 150);
+  useEffect(() => {
+    if (speakOn && countdown > 0) speak(String(countdown));
+  }, [countdown, speakOn]);
   const units = unitCost(concerns.length, mode ?? "hd");
 
   return (
@@ -227,7 +249,14 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
         <h2 id="capture-title" className={styles.title}>
           {title}
         </h2>
-        {mode && <span className="tiny faint mono">{mode.toUpperCase()} analysis, locked for this trial</span>}
+        <div className="row" style={{ gap: 12, alignItems: "center" }}>
+          {mode && <span className="tiny faint mono">{mode.toUpperCase()} analysis, locked for this trial</span>}
+          {speechOk && (
+            <button className="btn btn-quiet btn-sm" aria-pressed={speakOn} onClick={() => setSpeakOn(!speakOn)}>
+              Speak guidance
+            </button>
+          )}
+        </div>
       </div>
 
       <div className={styles.frame} data-phase={phase}>

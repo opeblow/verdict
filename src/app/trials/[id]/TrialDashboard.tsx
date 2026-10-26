@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import { CompareSlider } from "@/components/verdict/CompareSlider";
 import { TrendChart } from "@/components/verdict/TrendChart";
 import { DECISION_LABEL, STATUS_LABEL, Tag } from "@/components/verdict/labels";
+import { spokenVerdict } from "@/components/verdict/spoken";
+import { speak, useSpokenGuidance } from "@/lib/client/speech";
 import { matchScore } from "@/lib/capture/quality";
 import { deleteCheckIn, deleteTrial, saveTrial } from "@/lib/client/db";
 import { checkInCalendar } from "@/lib/client/ics";
@@ -64,6 +66,7 @@ function Dashboard({ trial, checkIns, isNew, reload }: { trial: Trial; checkIns:
   const [showMask, setShowMask] = useState(false);
   const weeksIn = Math.max(0, daysBetween(trial.startedAt, new Date()) / 7);
   const ended = trial.status === "ended";
+  const [, , speechOk] = useSpokenGuidance();
 
   function downloadCalendar() {
     const ics = checkInCalendar({
@@ -141,6 +144,11 @@ function Dashboard({ trial, checkIns, isNew, reload }: { trial: Trial; checkIns:
             {verdict.headline}
           </h2>
           <p className={styles.detail}>{verdict.detail}</p>
+          {speechOk && (
+            <button className="btn btn-quiet btn-sm" onClick={() => speak(spokenVerdict(verdict, trial.product.name, { ended }))}>
+              Read the verdict aloud
+            </button>
+          )}
         </div>
         <div className={styles.verdictSide}>
           <dl className={styles.facts}>
