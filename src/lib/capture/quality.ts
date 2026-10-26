@@ -7,6 +7,13 @@ import type { CaptureConditions } from "../domain/model";
  * radiance, and a lamp on one side can look like uneven texture. Verdict
  * therefore measures the light on every photo and compares it against the
  * baseline before it lets a photo count.
+ *
+ * Every absolute check must give the same answer for every skin tone in the
+ * same light. Mean face brightness fails that test: the darkest tones on the
+ * Monk Skin Tone scale read as "too dark" in perfect light, and the lightest
+ * as "glare". So absolute checks use measures that depend on the light, not
+ * the skin: scene exposure, blown-out pixels, and contrast-relative sharpness.
+ * Mean face brightness is only compared with the same person's baseline.
  */
 
 export interface PixelFrame {
@@ -17,6 +24,9 @@ export interface PixelFrame {
 
 /** The face guide oval, as fractions of the frame. Shared with the camera overlay. */
 export const FACE_GUIDE = { cx: 0.5, cy: 0.46, rx: 0.34, ry: 0.3 } as const;
+
+/** Width of the border strip used to judge room light, as a fraction of each side. */
+export const ROOM_EDGE = 0.12;
 
 function insideGuide(x: number, y: number, w: number, h: number): boolean {
   const dx = (x - FACE_GUIDE.cx * w) / (FACE_GUIDE.rx * w);
@@ -37,6 +47,8 @@ export function measureFrame(frame: PixelFrame, fullSize?: { width: number; heig
   let b = 0;
   let clipped = 0;
   const cx = FACE_GUIDE.cx * w;
+  const roomHist = new Uint32Array(256);
+  let roomN = 0;
 
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -46,6 +58,10 @@ export function measureFrame(frame: PixelFrame, fullSize?: { width: number; heig
       const B = data[i + 2]!;
       const l = 0.2126 * R + 0.7152 * G + 0.0722 * B;
       luma[y * w + x] = l;
+      if (x < ROOM_EDGE * w || x >= (1 - ROOM_EDGE) * w || y < ROOM_EDGE * h || y >= (1 - ROOM_EDGE) * h) {
+        roomHist[Math.min(255, Math.round(l))]!++;
+        roomN++;
+      }
       if (!insideGuide(x, y, w, h)) continue;
       sum += l;
       n++;
@@ -83,8 +99,15 @@ export function measureFrame(frame: PixelFrame, fullSize?: { width: number; heig
   const lapMean = lapN ? lapSum / lapN : 0;
   const sharpness = lapN ? lapSq / lapN - lapMean * lapMean : 0;
 
+  // The brighter parts of the room track the light and not the skin. Only a
+  // strip along the frame's edges is used, which a framed face does not reach:
+  // even face highlights, or skin just outside the guide, are brighter on
+  // lighter skin and would let a lighter face pass where a darker one is blocked.
+  const exposure = percentile(roomHist, roomN, 0.9);
+
   return {
     luma: round(mean),
+    exposure: round(exposure),
     balance: round(mean ? (lMean - rMean) / mean : 0, 3),
     warmth: round(b ? r / b : 1, 3),
     sharpness: round(sharpness),
@@ -92,6 +115,17 @@ export function measureFrame(frame: PixelFrame, fullSize?: { width: number; heig
     width: fullSize?.width ?? w,
     height: fullSize?.height ?? h,
   };
+}
+
+function percentile(hist: Uint32Array, total: number, p: number): number {
+  if (!total) return 0;
+  const target = p * total;
+  let seen = 0;
+  for (let v = 0; v < hist.length; v++) {
+    seen += hist[v]!;
+    if (seen >= target) return v;
+  }
+  return 255;
 }
 
 function round(v: number, digits = 1): number {
@@ -108,9 +142,15 @@ export interface CaptureIssue {
 }
 
 export const LIMITS = {
-  tooDark: 70,
-  dim: 95,
-  tooBright: 220,
+  /**
+   * Room exposure below this blocks the photo. 75 and 100 keep the strictness
+   * the old face-brightness rule had for a mid-range skin tone, while applying
+   * it equally to every tone.
+   */
+  tooDark: 75,
+  /** Room exposure below this warns. */
+  dim: 100,
+  /** Fraction of blown-out face pixels above this warns. */
   glare: 0.06,
   sideLightWarn: 0.15,
   sideLightBlock: 0.28,
@@ -124,12 +164,14 @@ export const LIMITS = {
 /** Problems with a frame, worst first. A "block" issue stops the photo being taken. */
 export function assessConditions(c: CaptureConditions, baseline?: CaptureConditions | null): CaptureIssue[] {
   const issues: CaptureIssue[] = [];
-  if (c.luma < LIMITS.tooDark) {
+  const exposure = c.exposure ?? c.luma;
+  if (exposure < LIMITS.tooDark) {
     issues.push({ id: "dark", level: "block", message: "Too dark. Face a window or a bright light." });
-  } else if (c.luma < LIMITS.dim) {
+  } else if (exposure < LIMITS.dim) {
     issues.push({ id: "dim", level: "warn", message: "A little dim. More light gives steadier scores." });
   }
-  if (c.luma > LIMITS.tooBright || c.clipped > LIMITS.glare) {
+  // Blown-out pixels mean glare on any skin tone. A bright average does not.
+  if (c.clipped > LIMITS.glare) {
     issues.push({ id: "glare", level: "warn", message: "Glare on your skin. Step back from the light or turn off the flash." });
   }
   if (Math.abs(c.balance) > LIMITS.sideLightBlock) {
@@ -137,7 +179,7 @@ export function assessConditions(c: CaptureConditions, baseline?: CaptureConditi
   } else if (Math.abs(c.balance) > LIMITS.sideLightWarn) {
     issues.push({ id: "side", level: "warn", message: `Light is a bit stronger on your ${c.balance > 0 ? "left" : "right"}. Turn slightly towards it.` });
   }
-  if (c.sharpness < LIMITS.blurry) {
+  if (relativeSharpness(c) < LIMITS.blurry) {
     issues.push({ id: "blur", level: "warn", message: "Looks blurry. Hold still, or rest the phone on something." });
   }
 
@@ -165,6 +207,16 @@ export function assessConditions(c: CaptureConditions, baseline?: CaptureConditi
   }
 
   return issues.sort((a, b) => (a.level === b.level ? 0 : a.level === "block" ? -1 : 1));
+}
+
+/**
+ * Laplacian variance scales with the square of brightness, so the same detail
+ * on darker skin reads as blurrier. Scale it up to a mid-grey reference for
+ * darker faces. It is never scaled down, so no one is held to a stricter bar.
+ */
+export function relativeSharpness(c: Pick<CaptureConditions, "sharpness" | "luma">): number {
+  const ref = 128;
+  return c.sharpness * Math.max(1, (ref / Math.max(16, c.luma)) ** 2);
 }
 
 /** 0 to 100: how closely this frame's light matches the baseline. */

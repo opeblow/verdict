@@ -47,6 +47,12 @@ export default function MethodPage() {
         colour temperature, glare and blur. Each is compared with the first photo of the trial. Large mismatches block the photo. Small ones warn.
         The first photo is also shown faintly over the camera view, so you line up at the same distance and angle every week.
       </p>
+      <p>
+        Checks that do not compare with your own first photo are judged on the room, never on your skin. Whether a photo is too dark is read
+        from the light around you, glare from blown-out pixels, and blur relative to your own skin&apos;s contrast. Judging by how bright a face
+        looks would turn away darker skin in good light and flag lighter skin as glare. Every tone on the Monk Skin Tone scale gets the same
+        answer in the same light, and the tests check this for all ten.
+      </p>
 
       <h2>3. Your noise floor</h2>
       <p>

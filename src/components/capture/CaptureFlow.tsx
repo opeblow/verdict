@@ -294,7 +294,7 @@ export function CaptureFlow({ mode, concerns, baseline, ghost, title, onDone, on
             <dl className={styles.meters}>
               <div>
                 <dt>Light</dt>
-                <dd className="mono">{Math.round(live.luma)}</dd>
+                <dd className="mono">{Math.round(live.exposure ?? live.luma)}</dd>
               </div>
               <div>
                 <dt>Evenness</dt>

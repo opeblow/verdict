@@ -16,15 +16,15 @@ A score from one photo says little. A change between photos means something only
 
 ## 2. Matched conditions
 
-Computed on a 150 px wide sample inside the face guide, about six times a second ([`quality.ts`](../src/lib/capture/quality.ts)):
+Computed on a 150 px wide sample of the cropped frame, about six times a second ([`quality.ts`](../src/lib/capture/quality.ts)). Absolute checks depend only on the light, never on skin tone ([ADR 0009](adr/0009-light-checks-judge-the-room-not-the-skin.md)). Face brightness is only ever compared with the same person's first photo.
 
 | Measure | Definition | Block | Warn |
 |---|---|---|---|
-| Brightness | Mean Rec. 709 luma | below 70 | below 95, or above 220 |
-| Side light | (left mean minus right mean) divided by mean | beyond 0.28 | beyond 0.15 |
-| Glare | Share of pixels at luma 250 or more | | above 6% |
-| Blur | Variance of the 4-neighbour Laplacian | | below 12 |
-| Brightness vs first photo | Relative difference | beyond 35% | beyond 18% |
+| Room light | 90th percentile Rec. 709 luma in a strip along the frame's edges (12% of each side), away from the face | below 75 | below 100 |
+| Side light | (left mean minus right mean) divided by mean, inside the face guide | beyond 0.28 | beyond 0.15 |
+| Glare | Share of face pixels at luma 250 or more | | above 6% |
+| Blur | Variance of the 4-neighbour Laplacian inside the face guide, scaled up to a mid-grey reference for darker faces | | below 12 |
+| Face brightness vs first photo | Relative difference in mean face luma | beyond 35% | beyond 18% |
 | Colour temperature vs first photo | Difference in red over blue ratio | | beyond 0.15 |
 | Side light vs first photo | Difference in balance | | beyond 0.15 |
 

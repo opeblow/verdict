@@ -320,7 +320,7 @@ function Dashboard({ trial, checkIns, isNew, reload }: { trial: Trial; checkIns:
                     {new Date(c.takenAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
                   </td>
                   <td>{c.kind === "baseline" ? "Baseline" : "Check-in"}</td>
-                  <td className="num">{Math.round(c.conditions.luma)}</td>
+                  <td className="num">{Math.round(c.conditions.exposure ?? c.conditions.luma)}</td>
                   <td className="num">{first ? `${matchScore(c.conditions, first.conditions)}%` : "--"}</td>
                   <td style={{ textAlign: "right" }}>
                     <button className="btn btn-quiet btn-sm" onClick={() => removeCheckIn(c)}>

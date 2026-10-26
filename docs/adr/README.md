@@ -12,6 +12,7 @@ Short records of the decisions that shape Verdict, why they were made, and what 
 | [0006](0006-delete-from-youcam-after-local-save.md) | Photos are deleted from YouCam only after results are saved on the device | Accepted |
 | [0007](0007-concern-sets-fill-the-billing-tier.md) | Concern sets are filled to the edge of YouCam's billing tier | Accepted |
 | [0008](0008-browser-tests-mock-youcam.md) | Browser tests mock YouCam and never spend API units | Accepted |
+| [0009](0009-light-checks-judge-the-room-not-the-skin.md) | Light checks judge the room, not the skin, so every skin tone gets the same answer | Accepted |
 
 ## Format
 

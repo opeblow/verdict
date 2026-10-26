@@ -13,10 +13,11 @@ export interface FilePayload {
  *
  * `light` scales the whole image: 1 is even daylight, 0.3 is a dim room.
  * `seed` varies the skin texture so replicate photos are not byte-identical.
+ * `skin` is the skin colour, for example a Monk Skin Tone swatch.
  */
-export async function syntheticFace(page: Page, { light = 1, seed = 1 } = {}): Promise<FilePayload> {
+export async function syntheticFace(page: Page, { light = 1, seed = 1, skin = "#dcae8c" } = {}): Promise<FilePayload> {
   const base64 = await page.evaluate(
-    async ({ light, seed }) => {
+    async ({ light, seed, skin }) => {
       const c = document.createElement("canvas");
       c.width = 900;
       c.height = 1200;
@@ -27,18 +28,18 @@ export async function syntheticFace(page: Page, { light = 1, seed = 1 } = {}): P
       g.beginPath();
       g.ellipse(450, 470, 330, 420, 0, Math.PI, 2 * Math.PI);
       g.fill();
-      g.fillStyle = "#dcae8c";
+      g.fillStyle = skin;
       g.beginPath();
       g.ellipse(450, 560, 300, 380, 0, 0, 2 * Math.PI);
       g.fill();
       g.fillRect(380, 900, 140, 300);
 
-      // Fine skin texture, so the sharpness check sees real detail.
+      // Fine skin texture relative to the skin's own colour, so the sharpness
+      // check sees the same detail on every tone.
       let s = seed * 9301;
       const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
       for (let i = 0; i < 9000; i++) {
-        const shade = Math.round(150 + rnd() * 70);
-        g.fillStyle = `rgba(${shade},${Math.round(shade * 0.72)},${Math.round(shade * 0.58)},0.5)`;
+        g.fillStyle = rnd() > 0.5 ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)";
         g.fillRect(170 + rnd() * 560, 200 + rnd() * 720, 2, 2);
       }
 
@@ -67,7 +68,7 @@ export async function syntheticFace(page: Page, { light = 1, seed = 1 } = {}): P
       for (const b of bytes) bin += String.fromCharCode(b);
       return btoa(bin);
     },
-    { light, seed },
+    { light, seed, skin },
   );
   return { name: `face-${seed}.jpg`, mimeType: "image/jpeg", buffer: Buffer.from(base64, "base64") };
 }

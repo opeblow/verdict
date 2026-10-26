@@ -55,8 +55,14 @@ export interface MetricReading {
 }
 
 export interface CaptureConditions {
-  /** Mean luminance inside the face guide, 0 to 255. */
+  /** Mean luminance inside the face guide, 0 to 255. Depends on skin tone, so only compared with the same person's baseline. */
   luma: number;
+  /**
+   * How well lit the room is, 0 to 255, independent of skin tone: the 90th
+   * percentile brightness of a strip along the frame's edges, away from the
+   * face. Missing on photos taken before it was introduced.
+   */
+  exposure?: number;
   /** Left minus right luminance, as a fraction of the mean. Positive means lit from the left. */
   balance: number;
   /** Red over blue ratio. Above 1 is warm light. */
