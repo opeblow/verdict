@@ -4,6 +4,25 @@
   "private": true,
   "description": "Verdict runs a personal, statistically honest trial of a skincare product using YouCam AI Skin Analysis, then tells you whether to keep buying it.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opeblow/verdict.git"
+  },
+  "bugs": {
+    "url": "https://github.com/opeblow/verdict/issues"
+  },
+  "homepage": "https://github.com/opeblow/verdict#readme",
+  "keywords": [
+    "skincare",
+    "youcam",
+    "perfect-corp",
+    "skin-analysis",
+    "nextjs",
+    "statistics",
+    "indexeddb",
+    "privacy",
+    "hackathon"
+  ],
   "engines": {
     "node": ">=20.9.0"
   },
@@ -16,6 +35,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm run test",
     "smoke:youcam": "node scripts/youcam-smoke.mjs",
     "screenshots": "node scripts/screenshots.mjs"
@@ -28,6 +48,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^22.10.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.0",

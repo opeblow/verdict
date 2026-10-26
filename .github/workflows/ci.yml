@@ -48,3 +48,38 @@ jobs:
           name: coverage
           path: coverage/
           retention-days: 14
+
+  e2e:
+    name: Browser tests (journey, accessibility, API guards)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # YouCam is mocked in the browser and the server gets a placeholder key,
+      # so this job never spends API units.
+      - name: Browser tests
+        run: npm run test:e2e
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

@@ -6,6 +6,7 @@
 
 - [ ] `npm run check` passes
 - [ ] `npm run build` passes
+- [ ] `npm run test:e2e` passes (needed for UI changes)
 - [ ] New behaviour has a test
 - [ ] UI changes: screenshots attached, checked in light and dark mode and at phone width
 
