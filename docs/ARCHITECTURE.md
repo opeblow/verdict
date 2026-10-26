@@ -19,7 +19,9 @@ flowchart LR
     A["/api/analyze<br>validate, rate limit"]
     M["/api/mask<br>allow-listed proxy"]
     P["/api/products"]
+    MCP["/api/mcp<br>engine as read-only tools"]
   end
+  AI["AI assistant<br>(MCP client)"] --> MCP
   UI --> A
   UI --> M
   UI --> P
@@ -38,6 +40,7 @@ Dependencies point one way: UI, then client and capture code, then the pure doma
 | [`src/lib/capture`](../src/lib/capture) | Browser | Light and framing checks, crop and sizing | `quality.ts` stays pure and tested |
 | [`src/lib/client`](../src/lib/client) | Browser | IndexedDB, calls to Verdict's own API, calendar export | Never imports server code |
 | [`src/lib/youcam`](../src/lib/youcam) | Both | Response normalisation and error mapping | Tolerates missing fields |
+| [`src/lib/mcp`](../src/lib/mcp) | Server | The engine as MCP tools, and a small JSON-RPC handler | Read-only and stateless; never calls YouCam ([ADR 0011](adr/0011-mcp-tools-for-assistants.md)) |
 | [`src/lib/server`](../src/lib/server) | Server only | YouCam client, environment, access code, rate limits | The only code that reads the key ([ADR 0001](adr/0001-device-only-data-stateless-server.md)) |
 | [`src/app/api`](../src/app/api) | Server | Thin, validated route handlers | Validate input; errors as `{ error: { code, message } }` |
 | [`src/app`](../src/app), [`src/components`](../src/components) | Browser | Pages and UI | CSS Modules and the tokens in `globals.css` |
@@ -97,6 +100,7 @@ verdict/
 │   │   │   ├── analyze/      POST: start a task. [taskId]: GET poll, DELETE remove from YouCam
 │   │   │   ├── health/       is the server configured? (no secrets)
 │   │   │   ├── mask/         allow-listed proxy for YouCam result images
+│   │   │   ├── mcp/          Model Context Protocol endpoint for AI assistants
 │   │   │   └── products/     product search and barcode lookup
 │   │   ├── trials/
 │   │   │   ├── new/          four-step wizard: product, goals, setup, baseline photos
@@ -111,7 +115,8 @@ verdict/
 │   └── lib/
 │       ├── domain/           concerns, ingredients, stats, verdict rules (pure)
 │       ├── capture/          quality.ts (pure) and image.ts (browser)
-│       ├── client/           IndexedDB, API calls, hooks, calendar export
+│       ├── client/           IndexedDB, API calls, hooks, speech, calendar export
+│       ├── mcp/              engine tools and JSON-RPC handler for assistants
 │       ├── server/           YouCam client, env, guards, rate limits
 │       └── youcam/           normalisation and error mapping
 ├── tests/

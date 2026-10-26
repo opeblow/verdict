@@ -14,6 +14,7 @@ Short records of the decisions that shape Verdict, why they were made, and what 
 | [0008](0008-browser-tests-mock-youcam.md) | Browser tests mock YouCam and never spend API units | Accepted |
 | [0009](0009-light-checks-judge-the-room-not-the-skin.md) | Light checks judge the room, not the skin, so every skin tone gets the same answer | Accepted |
 | [0010](0010-spoken-guidance-on-device.md) | Spoken guidance and a read-aloud verdict, using on-device speech only | Accepted |
+| [0011](0011-mcp-tools-for-assistants.md) | The engine is available to AI assistants as stateless, read-only MCP tools | Accepted |
 
 ## Format
 

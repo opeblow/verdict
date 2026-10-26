@@ -19,6 +19,7 @@ Every error has the same shape:
 | `GET /api/mask?u={url}` | Copy a YouCam result image to the device | A YouCam result URL (allow-listed hosts only) | The image |
 | `GET /api/products?q={text}` | Search products | 2 to 80 characters | `{ products }` |
 | `GET /api/products?barcode={digits}` | Look up a barcode | 6 to 14 digits | `{ products }` |
+| `POST /api/mcp` | Model Context Protocol endpoint for AI assistants | JSON-RPC 2.0 message or batch | JSON-RPC response, or `202` for notifications. See [MCP.md](MCP.md) |
 
 If `ACCESS_CODE` is set, analysis and mask requests must carry it in the `x-access-code` header.
 

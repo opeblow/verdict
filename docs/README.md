@@ -17,6 +17,7 @@ Everything about Verdict beyond the [project README](../README.md).
 |---|---|
 | [SETUP.md](SETUP.md) | Install, configure, deploy and troubleshoot |
 | [API.md](API.md) | Verdict's HTTP routes, error codes and the normalised analysis shape |
+| [MCP.md](MCP.md) | Connecting an AI assistant to Verdict's engine |
 | [TESTING.md](TESTING.md) | The unit and browser suites, what each covers, and how to add tests |
 
 ## Trust it

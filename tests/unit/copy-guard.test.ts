@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
  * only allowed exception.
  */
 
-const ROOTS = ["src/app", "src/components", "src/lib/domain", "src/lib/youcam"];
+const ROOTS = ["src/app", "src/components", "src/lib/domain", "src/lib/youcam", "src/lib/mcp"];
 const BANNED = [/\bcures?\b/i, /\bheals?\b/i, /\btreat(s|ment|ing)?\b/i, /\bdiagnos(e|is|es|ing)\b/i, /\bprescri(be|ption)\b/i, /\bclinically proven\b/i, /\bguarantee/i];
 const ALLOWED_LINES = [/does not diagnose or treat any condition/, /not a diagnosis/, /is not a medical device/];
 const EMOJI = /\p{Extended_Pictographic}/u;
