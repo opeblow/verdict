@@ -6,8 +6,25 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
+      # Minor and patch updates are low risk and land together.
       dev-dependencies:
         dependency-type: development
+        update-types: [minor, patch]
+      runtime-dependencies:
+        dependency-type: production
+        update-types: [minor, patch]
+    ignore:
+      # Major versions of the toolchain change behaviour and are upgraded
+      # deliberately, one at a time, rather than in a grouped pull request.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+      - dependency-name: jsdom
+        update-types: [version-update:semver-major]
+      # Node types follow the supported runtime in package.json "engines".
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:
