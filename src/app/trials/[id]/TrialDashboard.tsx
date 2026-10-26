@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { CompareSlider } from "@/components/verdict/CompareSlider";
 import { TrendChart } from "@/components/verdict/TrendChart";
 import { DECISION_LABEL, STATUS_LABEL, Tag } from "@/components/verdict/labels";
+import { resultCard, reviewText } from "@/components/verdict/share";
 import { spokenVerdict } from "@/components/verdict/spoken";
 import { speak, useSpokenGuidance } from "@/lib/client/speech";
 import { matchScore } from "@/lib/capture/quality";
@@ -67,6 +68,33 @@ function Dashboard({ trial, checkIns, isNew, reload }: { trial: Trial; checkIns:
   const weeksIn = Math.max(0, daysBetween(trial.startedAt, new Date()) / 7);
   const ended = trial.status === "ended";
   const [, , speechOk] = useSpokenGuidance();
+  const review = useMemo(() => reviewText(verdict, trial.product), [verdict, trial.product]);
+  const [shareStatus, setShareStatus] = useState("");
+  const fileBase = `verdict-${trial.product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+  async function copyReview() {
+    try {
+      await navigator.clipboard.writeText(review);
+      setShareStatus("Copied. Paste it into the store's review form.");
+    } catch {
+      setShareStatus("Couldn't copy automatically. Select the text above and copy it.");
+    }
+  }
+
+  async function downloadCard() {
+    try {
+      const blob = await resultCard(verdict, trial.product);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${fileBase}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setShareStatus("Result card downloaded.");
+    } catch {
+      setShareStatus("Couldn't create the card in this browser.");
+    }
+  }
 
   function downloadCalendar() {
     const ics = checkInCalendar({
@@ -296,6 +324,32 @@ function Dashboard({ trial, checkIns, isNew, reload }: { trial: Trial; checkIns:
               <dd className="mono">{money(cost.perYear, trial.product.currency)}</dd>
             </div>
           </dl>
+        </section>
+      )}
+
+      {verdict.decision !== "baseline" && (
+        <section className={styles.section} aria-labelledby="share-h">
+          <h2 id="share-h" className={styles.h2}>
+            Share your result
+          </h2>
+          <p className="small muted">
+            For a product review or a friend. It includes the measured change, its 95% range and your photo noise, so a reader can judge it.
+            Your photo is never included.
+          </p>
+          <pre className={styles.review} aria-label="Review text">
+            {review}
+          </pre>
+          <div className="row">
+            <button className="btn" onClick={copyReview}>
+              Copy review text
+            </button>
+            <button className="btn btn-ghost" onClick={() => void downloadCard()}>
+              Download result card
+            </button>
+          </div>
+          <p className="small" role="status" aria-live="polite">
+            {shareStatus}
+          </p>
         </section>
       )}
 

@@ -30,7 +30,7 @@ test("a full trial: product, two baselines, a check-in, then the verdict page", 
   await expect(page.getByRole("heading", { name: "Saved." })).toBeVisible();
 
   await page.getByRole("link", { name: "See the verdict" }).click();
-  await expect(page.getByText("Too early to call.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Too early to call./ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Photo log" })).toBeVisible();
   const photoLog = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: /Light match/i }) });
   await expect(photoLog.getByRole("row", { name: /Baseline/ })).toHaveCount(2);
