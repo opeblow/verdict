@@ -11,9 +11,10 @@ Verdict is a Next.js 16 app that runs a measured trial of a skincare product usi
 ```bash
 npm install
 npm run dev          # http://localhost:3000
-npm run check        # lint + typecheck + tests. Must pass before any commit.
+npm run check        # lint + typecheck + unit tests. Must pass before any commit.
 npm run build        # must pass before any commit that touches src/app
-npm test -- tests/verdict.test.ts   # one suite
+npm run test:e2e     # browser tests against the build. Must pass before any UI change is merged.
+npm test -- tests/unit/verdict.test.ts   # one unit suite
 ```
 
 ## Map
@@ -27,7 +28,9 @@ npm test -- tests/verdict.test.ts   # one suite
 | `src/lib/capture/` | Light measurement (pure) and photo preparation (browser) | `quality.ts` stays pure and tested. |
 | `src/app/api/` | Route handlers | Validate input with Zod or explicit checks. Return `{ error: { code, message } }` on failure. Route files may only export HTTP handlers and route config. |
 | `src/components/` | UI | CSS Modules plus the tokens in `src/app/globals.css`. |
-| `tests/` | Vitest suites, `tests/fixtures/youcam.ts` | Fixtures follow the official OpenAPI shapes and the live error format. |
+| `tests/unit/` | Vitest suites | Fixtures in `tests/fixtures/youcam.ts` follow the official OpenAPI shapes and the live error format. |
+| `tests/e2e/` | Playwright suites, helpers in `support/` | Never call the live YouCam API. Use `mockYouCam` and `syntheticFace`. Never commit a real person's photo. |
+| `docs/` | Method, architecture, YouCam integration, API, setup, testing | A decision that changes an invariant needs a new record in `docs/adr/`. |
 
 ## Invariants: do not break these
 
@@ -36,7 +39,7 @@ npm test -- tests/verdict.test.ts   # one suite
 3. **The YouCam key never reaches the browser.** Only `src/lib/server` reads it.
 4. **The mask proxy only fetches allow-listed YouCam hosts** (`isAllowedResultUrl`). Do not loosen it without a test.
 5. **No server-side persistence of photos or scores.** No database, no logging of request bodies.
-6. **Cosmetic language only.** No medical claims. `tests/copy-guard.test.ts` enforces this, and it also bans emoji in user-facing text.
+6. **Cosmetic language only.** No medical claims. `tests/unit/copy-guard.test.ts` enforces this, and it also bans emoji in user-facing text.
 7. **Redness is always measured** as the irritation monitor (`SAFETY_CONCERNS`).
 8. **Change is only reported when it exceeds measured noise.** Do not add shortcuts that compare two single photos.
 
@@ -61,6 +64,6 @@ npm test -- tests/verdict.test.ts   # one suite
 
 ## Before you open a pull request
 
-- `npm run check` and `npm run build` pass.
+- `npm run check`, `npm run build` and `npm run test:e2e` pass.
 - New behaviour has a test.
 - If you changed the UI, run `npm run screenshots` and include before and after images.

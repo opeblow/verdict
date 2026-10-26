@@ -26,7 +26,7 @@ Verdict processes face photos, which are sensitive personal data. The design goa
 
 - **Content Security Policy.** The browser may only connect to Verdict's own origin. Scripts are same-origin. No third-party scripts, fonts or analytics. `frame-ancestors 'none'`. See [`next.config.ts`](next.config.ts).
 - **Other headers.** `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` allowing only the camera on the same origin, `Cross-Origin-Opener-Policy: same-origin`, HSTS.
-- **SSRF protection.** The mask proxy only fetches HTTPS URLs on allow-listed YouCam result hosts, rejects credentials and non-standard ports, refuses redirects, checks the content type and caps the size. Covered by tests in [`tests/server.test.ts`](tests/server.test.ts).
+- **SSRF protection.** The mask proxy only fetches HTTPS URLs on allow-listed YouCam result hosts, rejects credentials and non-standard ports, refuses redirects, checks the content type and caps the size. Covered by tests in [`tests/unit/server.test.ts`](tests/unit/server.test.ts).
 - **Input validation.** Upload type (JPEG or PNG), size (10 MB), dimensions, mode and concern names are validated before any upstream call. Task IDs are pattern-checked.
 - **Access code.** Compared in constant time.
 - **Rate limits.** In-memory sliding windows per visitor and per instance.

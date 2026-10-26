@@ -112,7 +112,7 @@ export function DataSettings() {
               ? "Server unreachable."
               : server.youcamConfigured
                 ? "YouCam API connected."
-                : "No YouCam API key on this server. See SETUP.md."}
+                : "No YouCam API key on this server. See docs/SETUP.md."}
         </p>
       </section>
 

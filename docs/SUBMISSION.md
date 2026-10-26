@@ -76,7 +76,7 @@ The API is most valuable as a measuring instrument used over time. One score is 
 5. Open the trial and choose **Check in now** to see the alignment overlay and light matching against your first photo.
 6. A finished eight-week trial cannot be produced in one sitting. The landing page shows the engine's output on an example trial, the demo video shows completed trials, and `npm test` runs every verdict rule.
 
-Repository setup: [SETUP.md](../SETUP.md).
+Repository setup: [SETUP.md](SETUP.md).
 
 ## Built with
 

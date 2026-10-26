@@ -290,7 +290,7 @@ export function NewTrialWizard() {
                 : "Put the phone down, step out of frame, then line up and take it again, exactly as before."}
             </p>
             {server === null || (server && !server.youcamConfigured) ? (
-              <p className="notice notice-stop">This server has no YouCam API key, so analysis can&apos;t run. See SETUP.md to add one.</p>
+              <p className="notice notice-stop">This server has no YouCam API key, so analysis can&apos;t run. See docs/SETUP.md to add one.</p>
             ) : null}
             <CaptureFlow
               key={baselineCount}

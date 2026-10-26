@@ -50,7 +50,7 @@ export function checkAccess(req: Request): NextResponse | null {
 export function youcamOrError(): YouCamClient | NextResponse {
   const e = serverEnv();
   if (!e.youcamApiKey) {
-    return jsonError(503, "not_configured", "The server has no YouCam API key. See SETUP.md.");
+    return jsonError(503, "not_configured", "The server has no YouCam API key. See docs/SETUP.md.");
   }
   return new YouCamClient({ apiKey: e.youcamApiKey, baseUrl: e.youcamBaseUrl, skinVersion: e.skinVersion });
 }

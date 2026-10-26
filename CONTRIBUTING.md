@@ -10,7 +10,7 @@ Thanks for helping make Verdict better. This guide covers how to propose changes
 
 ## Getting set up
 
-Follow [SETUP.md](SETUP.md). You do not need a YouCam key to work on the UI, the statistics or the tests; the test suite uses fixtures.
+Follow [docs/SETUP.md](docs/SETUP.md). You do not need a YouCam key to work on the UI, the statistics or the tests; the test suite uses fixtures.
 
 ## Workflow
 
@@ -22,7 +22,10 @@ Follow [SETUP.md](SETUP.md). You do not need a YouCam key to work on the UI, the
    ```bash
    npm run check
    npm run build
+   npm run test:e2e
    ```
+
+   What each suite covers, and how to add to it: [docs/TESTING.md](docs/TESTING.md).
 
 5. Open a pull request using the template. Describe the user-visible effect and how you tested it. Add screenshots for UI changes.
 
@@ -52,7 +55,7 @@ Edit `ACTIVES` in [`src/lib/domain/ingredients.ts`](src/lib/domain/ingredients.t
 - `match`: lowercase INCI or common-name fragments.
 - `targets`: `fromWeek` (earliest visible change commonly reported) and `callWeek` (when a fair verdict is possible).
 - `basis`: a named study if one anchors the range, otherwise a plain statement of the common range. Do not invent citations.
-- Add a detection test in `tests/domain.test.ts`.
+- Add a detection test in `tests/unit/domain.test.ts`.
 
 ## Licence
 

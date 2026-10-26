@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { guidanceFor, isRetakeError, parseEngineError } from "@/lib/youcam/errors";
 import { normalizeOutput } from "@/lib/youcam/normalize";
 import { YouCamClient, YouCamError, parseTaskState, type FetchLike } from "@/lib/server/youcam";
-import * as fx from "./fixtures/youcam";
+import * as fx from "../fixtures/youcam";
 
 interface Call {
   url: string;

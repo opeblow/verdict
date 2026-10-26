@@ -53,4 +53,4 @@ Changes to this notice are made in this file and are visible in the repository h
 
 ## Questions
 
-Open an issue on the repository, or for anything sensitive use the private reporting route in [SECURITY.md](SECURITY.md).
+Open an issue on the repository, or for anything sensitive use the private reporting route in [SECURITY.md](../SECURITY.md).

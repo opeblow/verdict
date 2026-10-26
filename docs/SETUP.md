@@ -59,9 +59,12 @@ Open [http://localhost:3000](http://localhost:3000). The camera works on `localh
 ## 5. Quality gates
 
 ```bash
-npm run check     # lint + typecheck + 100+ unit tests, as CI runs them
+npm run check     # lint + typecheck + unit tests, as CI runs them
 npm run build     # production build
+npm run test:e2e  # browser tests against the build; YouCam is mocked, no units spent
 ```
+
+The first browser test run needs `npx playwright install chromium`. See [TESTING.md](TESTING.md) for what each suite covers.
 
 ## 6. Deploy
 

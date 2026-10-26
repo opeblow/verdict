@@ -86,7 +86,7 @@ Anyone who buys skincare, and especially people trying an active ingredient (ret
 
 ## 3. Architecture
 
-See the diagrams in [README.md](README.md#architecture). Summary:
+See the diagrams in [README.md](ARCHITECTURE.md). Summary:
 
 - **Next.js 16 App Router, React 19, TypeScript strict.**
 - **Domain core** (`src/lib/domain`): pure functions for concerns, ingredients, statistics and verdict rules. No I/O, fully unit-tested.
@@ -117,7 +117,7 @@ See the diagrams in [README.md](README.md#architecture). Summary:
 | Tue 27 Oct | Test on a real phone (iOS Safari, Android Chrome): camera, framing, HD versus SD, export and import. |
 | Wed 28 Oct | Ask two or three friends to start a real trial on their phones. Note every confusing moment and fix it. |
 | Thu 29 Oct | Replace README screenshots with real captures where you are comfortable showing a face, or keep the illustrated sample data. Record the demo video (script below). |
-| Fri 30 Oct | Edit the video to under 3 minutes, upload to YouTube as public. Write the Devpost description from [docs/SUBMISSION.md](docs/SUBMISSION.md). |
+| Fri 30 Oct | Edit the video to under 3 minutes, upload to YouTube as public. Write the Devpost description from [docs/SUBMISSION.md](SUBMISSION.md). |
 | Sat 31 Oct | Submit a complete draft on Devpost. Post the demo publicly tagging @YouCam API with the disclosure "Received API credits for sharing", and claim the bonus units. |
 | Sun 1 Nov | Final pass: links, testing instructions, access code, units remaining. |
 | Mon 2 Nov | Deadline 08:45 PT. Do not change the live deployment during judging. |
