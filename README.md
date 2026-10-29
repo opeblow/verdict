@@ -9,6 +9,14 @@
 A measured, honest trial of one for any skincare product, built on YouCam AI Skin Analysis.<br>
 It ends with a decision you can act on at the till: keep buying it, stop, or wait until a named date.
 
+### Live app
+
+**[https://verdict-skye.onrender.com](https://verdict-skye.onrender.com)**
+
+### Demo video
+
+[![Watch the Verdict demo on YouTube](https://img.youtube.com/vi/Isq3wh2B8-c/maxresdefault.jpg)](https://youtu.be/Isq3wh2B8-c)
+
 [![CI](https://github.com/opeblow/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/opeblow/verdict/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/opeblow/verdict/actions/workflows/codeql.yml/badge.svg)](https://github.com/opeblow/verdict/actions/workflows/codeql.yml)
 [![Unit tests](https://img.shields.io/badge/unit%20tests-175-24613d.svg)](docs/TESTING.md#unit-tests-vitest)
@@ -17,8 +25,7 @@ It ends with a decision you can act on at the till: keep buying it, stop, or wai
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-1c1b18.svg?logo=typescript&logoColor=white)](tsconfig.json)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1c1b18.svg)](LICENSE)
 
-<!-- Before submitting, add: [Live demo](https://your-deployment) / [Demo video](https://youtu.be/...) / -->
-[For judges](#for-judges) &nbsp;/&nbsp; [How it decides](docs/METHOD.md) &nbsp;/&nbsp; [Architecture](docs/ARCHITECTURE.md) &nbsp;/&nbsp; [Decisions](docs/adr/README.md) &nbsp;/&nbsp; [Setup](docs/SETUP.md)
+[Live app](https://verdict-skye.onrender.com) &nbsp;/&nbsp; [Demo video](https://youtu.be/Isq3wh2B8-c) &nbsp;/&nbsp; [For judges](#for-judges) &nbsp;/&nbsp; [How it decides](docs/METHOD.md) &nbsp;/&nbsp; [Architecture](docs/ARCHITECTURE.md) &nbsp;/&nbsp; [Decisions](docs/adr/README.md) &nbsp;/&nbsp; [Setup](docs/SETUP.md)
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fopeblow%2Fverdict&env=YOUCAM_API_KEY&envDescription=Your%20YouCam%20API%20key.%20Add%20ACCESS_CODE%20later%20to%20protect%20a%20public%20demo&envLink=https%3A%2F%2Fgithub.com%2Fopeblow%2Fverdict%2Fblob%2Fmain%2Fdocs%2FSETUP.md&project-name=verdict&repository-name=verdict)
 
